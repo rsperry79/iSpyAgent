@@ -2,9 +2,7 @@ ARG REPO=mcr.microsoft.com/dotnet/runtime-deps
 FROM $REPO:3.1-buster-slim-arm64v8
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends 
 
 # Install .NET Core
 RUN dotnet_version=3.1.0 \
