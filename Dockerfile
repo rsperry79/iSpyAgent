@@ -1,5 +1,7 @@
+ARG arch
+
 ARG REPO=mcr.microsoft.com/dotnet/runtime-deps
-FROM $REPO:3.1-buster-slim-arm64v8
+FROM $REPO:3.1-buster-slim-${arch}v8
 
 # RUN apt-get update \
 #     && apt-get install -y --no-install-recommends 
@@ -49,7 +51,7 @@ RUN if [ "${FILE_LOCATION_SET}" = "true" ]; then \
     else \
     #Get latest instead
     echo "Downloading latest" && \
-    wget -c $(wget -qO- "https://www.ispyconnect.com/api/Agent/DownloadLocation2?productID=24&is64=true&platform=Linux" | tr -d '"') -O agent.zip; \
+    wget -c $(wget -qO- "https://www.ispyconnect.com/api/Agent/DownloadLocation2?productID=24&is64=true&platform=${arch}" | tr -d '"') -O agent.zip; \
     fi && \
     unzip agent.zip -d /agent && \
     rm agent.zip
