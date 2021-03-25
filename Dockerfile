@@ -1,11 +1,8 @@
 ARG REPO=mcr.microsoft.com/dotnet/runtime-deps
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic-arm64v8
-
-ARG FILE_LOCATION="https://ispyfiles.azureedge.net/downloads/Agent_ARM64_3_2_5_0.zip"
-ENV DEFAULT_FILE_LOCATION="https://www.ispyconnect.com/api/Agent/DownloadLocation2?productID=24&is64=true&platform=arm64"
+ENV DEFAULT_FILE_LOCATION="https://www.ispyconnect.com/api/Agent/DownloadLocation2?productID=24&is64=true&platform=ARM"
 ARG DEBIAN_FRONTEND=noninteractive 
 ARG TZ=America/Los_Angeles
-ARG CURL_FILE_LOCATION
 
 RUN apt update \
     && apt install -y --no-install-recommends \
@@ -19,20 +16,17 @@ RUN apt update && \
         libtbb-dev libc6-dev gss-ntlmssp libgdiplus tzdata
 
 # Install jonathon's ffmpeg
-RUN add-apt-repository ppa:jonathonf/ffmpeg-4 -y
+RUN add-apt-repository ppa:jonathonf/ffmpeg-4 -y && \
+    apt update && \ 
+    apt install -y ffmpeg
 
 # Run upgrade
 RUN apt update && apt upgrade -y 
 
-# Download/Install iSpy Agent DVR: 
-RUN if [FILE_LOCATION]; \
-    then \
-        $(curl  ${DEFAULT_FILE_LOCATION} |  grep https:) | read FILE_LOCATION;\
-    fi;
+# Download/Install iSpy Agent DVR
+RUN curl -l  $(curl  ${DEFAULT_FILE_LOCATION} |  grep https| tr -d '"') -o agent.zip && unzip agent.zip -d /agent && rm agent.zip;
 
-RUN curl -l ${FILE_LOCATION} -o agent.zip && unzip agent.zip -d /agent && rm agent.zip;
-
-# Clean up
+# Cleanup
 RUN apt -y --purge remove unzip wget \ 
     && apt autoremove -y \
     && apt clean \
